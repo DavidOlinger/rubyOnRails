@@ -1,0 +1,127 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Shared Schedule: <%= @shared_schedule.schedule_name %></title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+          margin: 20px;
+          line-height: 1.5;
+          background-color: #f8f9fa;
+          color: #333;
+        }
+        .container {
+          max-width: 900px;
+          margin: 0 auto;
+          background-color: #fff;
+          padding: 25px;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+          border-bottom: 1px solid #eee;
+          padding-bottom: 10px;
+          margin-bottom: 15px;
+          color: #0056b3; /* A blue tone */
+        }
+        h2 {
+            color: #555;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 20px;
+          font-size: 0.9em;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 10px; /* Increased padding */
+          text-align: left;
+          vertical-align: top; /* Align content top */
+        }
+        th {
+          background-color: #e9ecef; /* Lighter grey header */
+          font-weight: 600; /* Slightly bolder */
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa; /* Subtle striping */
+        }
+        .meta-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .error {
+          color: #d9534f; /* Bootstrap danger color */
+          font-weight: bold;
+          background-color: #f2dede;
+          border: 1px solid #ebccd1;
+          padding: 10px;
+          border-radius: 4px;
+          margin-bottom: 15px;
+        }
+        .no-events {
+            color: #777;
+            font-style: italic;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>Shared Schedule</h1>
+        <h2><%= @shared_schedule.schedule_name %></h2>
+        <p class="meta-info">Shared by: <%= @shared_schedule.username %></p>
+
+        <%# Display error message if JSON parsing failed %>
+        <% if @error_message %>
+          <p class="error"><%= @error_message %></p>
+        <% end %>
+
+        <%# Check if there are events to display %>
+        <% if @schedule_data && @schedule_data[:events]&.any? %>
+          <table>
+            <thead>
+              <tr>
+                <th>Event/Course Name</th>
+                <th>Type</th>
+                <th>Days</th>
+                <th>Time</th>
+                <th>Location</th>
+                <th>Professor</th>
+                <th>Code</th>
+                <th>Section</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%# Loop through each event from the parsed @schedule_data %>
+              <%# Sort events for consistent display (optional) %>
+              <% @schedule_data[:events].sort_by { |event| [event[:days] || '', event.dig(:time, :startTime) || 0] }.each do |event| %>
+                <%# Call the helper method from shared_schedules_helper.rb %>
+                <% start_time_str, end_time_str = format_event_time(event[:time]) %>
+                <tr>
+                  <%# Access data using symbols because we used symbolize_names: true %>
+                  <td><%= event[:name] || 'N/A' %></td>
+                  <%# Determine type based on presence of courseCode %>
+                  <td><%= event[:courseCode] ? 'Course' : 'Custom' %></td>
+                  <td><%= event[:days] || 'N/A' %></td>
+                  <td><%= start_time_str %> - <%= end_time_str %></td>
+                  <%# Display course-specific details if they exist %>
+                  <td><%= event[:location] || 'N/A' %></td>
+                  <td><%= event.dig(:professor, :name) || 'N/A' %></td> <%# Use .dig for safer access %>
+                  <td><%= event[:courseCode] || 'N/A' %></td>
+                  <td><%= event[:section] || 'N/A' %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <%# Show message if no events are in the schedule data %>
+          <p class="no-events">This schedule has no events.</p>
+        <% end %>
+      </div> <%# End container %>
+    </body>
+    </html>
+
+    <%# --- The < % ! ... % > block defining format_event_time has been REMOVED --- %>
+    <%# --- The method is now defined in app/helpers/shared_schedules_helper.rb --- %>
+    

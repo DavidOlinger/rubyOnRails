@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  share_token: MyString
+  username: MyString
+  schedule_name: MyString
+  schedule_content: MyText
+
+two:
+  share_token: MyString
+  username: MyString
+  schedule_name: MyString
+  schedule_content: MyText

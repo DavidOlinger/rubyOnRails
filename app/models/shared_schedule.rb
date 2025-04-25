@@ -1,0 +1,2 @@
+class SharedSchedule < ApplicationRecord
+end
